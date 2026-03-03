@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "noImplicitReturns": false,
+    "noImplicitAny": false,
+    "moduleResolution": "node",
+    "noUnusedLocals": false,
+    "outDir": "lib",
+    "sourceMap": true,
+    "target": "ES2022",
+    "allowJs": true
+  },
+  "typeRoots": ["node_modules/@types"],
+  "compileOnSave": true,
+  "include": ["src", "src/*/*.hbs", "main.ts","scripts"]
+}
