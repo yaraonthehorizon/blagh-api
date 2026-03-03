@@ -1167,7 +1167,6 @@ export class UserController {
    *     parameters:
    *       - in: path
    *         name: permission
-   *         name: permission
    *         required: true
    *         schema:
    *           type: string
