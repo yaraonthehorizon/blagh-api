@@ -1,8 +1,8 @@
-export interface KnowledgeItem {
+export interface APIKnowledgeItem {
     id: number
     source_id: number
     title: string
-    type: string
+    datatype: string
     add_date: number
     update_date: number
     description: string
@@ -22,4 +22,4 @@ export interface KnowledgeItem {
 }
 
 // New type for the array that can also be an error
-export type KnowledgeItemResponse = KnowledgeItem | { error: string }
+export type KnowledgeItemResponse = APIKnowledgeItem | { error: string }

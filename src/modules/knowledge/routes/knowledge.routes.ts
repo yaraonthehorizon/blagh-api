@@ -8,7 +8,7 @@ router.get('/get-category-tree/:sourceLanguage', (req, res) =>
     controller.getCategoryTree(req, res)
 )
 router.get(
-    '/get-category-items/:categoryId/:sourceLanguage:/translationLanguage:page/:pageSize',
+    '/get-category-items/:categoryId/:sourceLanguage/:translationLanguage/:page/:pageSize',
     (req, res) => controller.getCategoryItems(req, res)
 )
 router.get(
@@ -17,7 +17,7 @@ router.get(
 )
 
 router.get(
-    '/get-subcategory-items/:subCategoryId/:sourceLanguage/:translationLanguage',
+    '/get-subcategory-items/:subCategoryId/:sourceLanguage/:translationLanguage/:page/:pageSize',
     (req, res) => controller.getSubcategoryItems(req, res)
 )
 

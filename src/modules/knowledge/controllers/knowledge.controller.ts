@@ -64,7 +64,7 @@ export class KnowledgeController {
      *         name: categoryId
      *         required: true
      *         schema:
-     *           type: string
+     *           type: number
      *       - in: path
      *         name: translationLanguage
      *         required: true
@@ -79,12 +79,12 @@ export class KnowledgeController {
      *         name: page
      *         required: true
      *         schema:
-     *           type: string
+     *           type: number
      *       - in: path
      *         name: pageSize
      *         required: true
      *         schema:
-     *           type: string
+     *           type: number
      *     responses:
      *       '200':
      *         description: Category items retrieved successfully
@@ -140,7 +140,7 @@ export class KnowledgeController {
      *         name: subCategoryId
      *         required: true
      *         schema:
-     *           type: string
+     *           type: number
      *       - in: path
      *         name: sourceLanguage
      *         required: true
@@ -151,6 +151,16 @@ export class KnowledgeController {
      *         required: true
      *         schema:
      *           type: string
+     *       - in: path
+     *         name: page
+     *         required: true
+     *         schema:
+     *           type: number
+     *       - in: path
+     *         name: pageSize
+     *         required: true
+     *         schema:
+     *           type: number
      *     responses:
      *       '200':
      *         description: Subcategory items retrieved successfully
@@ -158,12 +168,19 @@ export class KnowledgeController {
     async getSubcategoryItems(req: Request, res: Response): Promise<void> {
         const requestIdentifier = req.headers['x-request-id'] || uuidv4()
         try {
-            const { subCategoryId, sourceLanguage, translationLanguage } =
-                req.params
+            const {
+                subCategoryId,
+                sourceLanguage,
+                translationLanguage,
+                page,
+                pageSize,
+            } = req.params
             const result = await this.service.getSubcategoryItems(
                 subCategoryId,
                 sourceLanguage,
-                translationLanguage
+                translationLanguage,
+                parseInt(page),
+                parseInt(pageSize)
             )
             result.requestIdentifier = requestIdentifier as string
             handleResponse(res, result)
@@ -199,7 +216,7 @@ export class KnowledgeController {
      *         name: itemId
      *         required: true
      *         schema:
-     *           type: string
+     *           type: number
      *       - in: path
      *         name: sourceLanguage
      *         required: true
