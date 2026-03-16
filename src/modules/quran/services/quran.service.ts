@@ -48,19 +48,41 @@ export class QuranService {
     async getRecitersAndAssociatedRecitations(
         id: string,
         locale: string
-    ): Promise<Result<ReciterInfo>> {
+    ): Promise<Result<ReciterInfo[]>> {
         try {
-            const response = await this.apiClient.get<ReciterInfo>(
-                `/quran/get-category/${id}/${locale}/json`
-            )
-
-            if (!response.data || Object.keys(response.data).length === 0) {
-                return Result.error(
-                    'Reciter category not found or returned empty data'
+            const response =
+                await this.apiClient.get<RecitationCategoryDetails>(
+                    `/quran/get-category/${id}/${locale}/json`
                 )
-            }
 
-            return Result.success(response.data)
+            const currentReciters = response.data.authors.slice(10, 20)
+            // const validReciters = await Promise.all(
+            //     currentReciters.map(async (reciter) => {
+            //         for (const id of reciter.recitations_info.recitations_ids) {
+            //             try {
+            //                 const rec = await this.getRecitationInfo(
+            //                     String(id),
+            //                     locale
+            //                 )
+
+            //                 if (rec.data?.attachments?.length) {
+            //                     return {
+            //                         ...reciter,
+            //                         validRecitation: rec.data,
+            //                     }
+            //                 }
+            //             } catch {
+            //                 // ignore failed recitation
+            //             }
+            //         }
+
+            //         return null
+            //     })
+            // )
+
+            // const filteredReciters = validReciters.filter(Boolean)
+
+            return Result.success(currentReciters)
         } catch (error: any) {
             return Result.error(
                 `Failed to fetch Quran category details: ${error.message}`

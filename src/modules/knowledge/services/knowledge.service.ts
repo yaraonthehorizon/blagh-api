@@ -1,6 +1,7 @@
 import { Result } from '../../../shared/types/result'
 import { createApiClient } from '../../../core/http/api-client'
 import {
+    APIKnowledgeItem,
     KnowledgeCategory,
     KnowledgeItem,
     KnowledgeResponse,
@@ -19,6 +20,7 @@ export class KnowledgeService {
             const response = await this.apiClient.get<KnowledgeResponse>(
                 `/main/get-object-category-tree/${sourceLanguage}/json`
             )
+
             const categories = response.data.sub_categories ?? []
 
             const normalizedCategories = categories.map((cat) => ({
@@ -41,27 +43,12 @@ export class KnowledgeService {
                     } satisfies KnowledgeSubcategory,
                 ],
             }))
-            const flattenedSubCategories = normalizedCategories.flatMap(
-                (cat) => cat.sub_categories
-            )
-            const apiSubCategories = response.data.sub_categories ?? []
 
-            const mergedSubCategories = [
-                ...apiSubCategories,
-                ...flattenedSubCategories,
-            ]
-
-            const normalizedSubCategories = Array.from(
-                new Map(mergedSubCategories.map((sc) => [sc.id, sc])).values()
-            )
-
-            const normalizedData = {
+            const normalizedResponse: KnowledgeResponse = {
                 ...response.data,
-                categories: normalizedCategories,
-                all_sub_categories: normalizedSubCategories,
+                sub_categories: normalizedCategories,
             }
-
-            return Result.success(normalizedData)
+            return Result.success(normalizedResponse)
         } catch (error: any) {
             return Result.error(
                 `Failed to fetch object category tree: ${error.message}`
@@ -91,13 +78,41 @@ export class KnowledgeService {
     async getSubcategoryItems(
         subCategoryId: string,
         sourceLanguage: string,
-        translationLanguage: string
-    ): Promise<Result<KnowledgeItem[]>> {
+        translationLanguage: string,
+        page: number = 1,
+        pageSize: number = 10
+    ): Promise<
+        Result<{
+            data: KnowledgeItem[]
+            page: number
+            pageSize: number
+            total: number
+            totalPages: number
+        }>
+    > {
         try {
-            const response = await this.apiClient.get<KnowledgeItem[]>(
+            const response = await this.apiClient.get<APIKnowledgeItem[]>(
                 `/categories/viewitems/${subCategoryId}/showall/${sourceLanguage}/showall/json`
             )
-            return Result.success(response.data)
+
+            const items = response.data
+            const start = (page - 1) * pageSize
+            const end = start + pageSize
+
+            const paginatedItems = items.slice(start, end)
+            return Result.success({
+                data: [
+                    ...paginatedItems.map((item) => ({
+                        ...item,
+                        type: item.datatype,
+                        mediaType: item.datatype,
+                    })),
+                ],
+                page,
+                pageSize,
+                total: items.length,
+                totalPages: Math.ceil(items.length / pageSize),
+            })
         } catch (error: any) {
             return Result.error(
                 `Failed to fetch subcategory items: ${error.message}`
@@ -114,7 +129,12 @@ export class KnowledgeService {
             const response = await this.apiClient.get<KnowledgeItem>(
                 `/main/get-item/${itemId}/${sourceLanguage}/json`
             )
-            return Result.success(response.data)
+
+            const item = {
+                ...response.data,
+                type: response.data.type,
+            }
+            return Result.success(item)
         } catch (error: any) {
             return Result.error(`Failed to fetch item: ${error.message}`)
         }
