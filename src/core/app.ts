@@ -3,15 +3,18 @@ import { DatabaseManager } from './database/connection'
 import { ServerManager } from './server/manager'
 import { PluginManager } from '../plugins/base/manager'
 import { logger } from './logging'
+import { CacheManager } from './cache/cache-manager'
 
 export class Application {
     private configManager: ConfigManager
     private databaseManager: DatabaseManager
     private pluginManager: PluginManager
     private serverManager: ServerManager
+    private cacheManager: CacheManager
 
     constructor() {
         this.configManager = new ConfigManager()
+        this.cacheManager = CacheManager.getInstance()
     }
 
     async initialize(): Promise<void> {
@@ -26,6 +29,8 @@ export class Application {
             this.databaseManager = new DatabaseManager(config.database)
             await this.databaseManager.initialize()
             logger.info('[Application] Database initialized')
+            // Initialize cache manager
+            await this.cacheManager.initialize()
 
             // Initialize plugin manager
             const pluginContext = {
@@ -59,7 +64,7 @@ export class Application {
                 environment: process.env.NODE_ENV || 'development',
                 port: parseInt(process.env.PORT || '4000', 10),
                 host: process.env.HOST || '0.0.0.0',
-                cors: true, // Always enable CORS for now
+                cors: config.cors,
                 compression: config.security.compression,
                 security: config.security.helmet,
             }
@@ -112,6 +117,10 @@ export class Application {
                 await this.databaseManager.closeAll()
             }
 
+            if (this.cacheManager) {
+                await this.cacheManager.closeAll()
+            }
+
             logger.info('[Application] Application stopped successfully')
         } catch (error) {
             logger.error('[Application] Error stopping application:', error)
@@ -133,5 +142,9 @@ export class Application {
 
     getServerManager(): ServerManager {
         return this.serverManager
+    }
+
+    getCacheManager(): CacheManager {
+        return this.cacheManager
     }
 }

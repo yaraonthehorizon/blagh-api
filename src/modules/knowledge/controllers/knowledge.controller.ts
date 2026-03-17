@@ -229,12 +229,8 @@ export class KnowledgeController {
     async getItem(req: Request, res: Response): Promise<void> {
         const requestIdentifier = req.headers['x-request-id'] || uuidv4()
         try {
-            const { itemId, sourceLanguage, translationLanguage } = req.params
-            const result = await this.service.getItem(
-                itemId,
-                sourceLanguage,
-                translationLanguage
-            )
+            const { itemId, sourceLanguage } = req.params
+            const result = await this.service.getItem(itemId, sourceLanguage)
             result.requestIdentifier = requestIdentifier as string
             handleResponse(res, result)
         } catch (error: any) {

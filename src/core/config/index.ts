@@ -322,8 +322,26 @@ export class ConfigManager {
                 file: process.env.LOG_FILE || 'logs/app.log',
             },
             cors: {
-                origin: process.env.CORS_ORIGIN || '*',
+                origin: process.env.CORS_ORIGIN
+                    ? process.env.CORS_ORIGIN.includes(',')
+                        ? process.env.CORS_ORIGIN.split(',').map((o) =>
+                              o.trim()
+                          )
+                        : process.env.CORS_ORIGIN
+                    : '*',
                 credentials: process.env.CORS_CREDENTIALS === 'true',
+                methods: process.env.CORS_METHODS?.split(',') || [
+                    'GET',
+                    'HEAD',
+                    'PUT',
+                    'PATCH',
+                    'POST',
+                    'DELETE',
+                    'OPTIONS',
+                ],
+                allowedHeaders: process.env.CORS_ALLOWED_HEADERS?.split(
+                    ','
+                ) || ['Content-Type', 'Authorization', 'Accept'],
             },
             security: {
                 rateLimit: {
@@ -873,6 +891,16 @@ export class ConfigManager {
             cors: {
                 origin: '*',
                 credentials: false,
+                methods: [
+                    'GET',
+                    'HEAD',
+                    'PUT',
+                    'PATCH',
+                    'POST',
+                    'DELETE',
+                    'OPTIONS',
+                ],
+                allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
             },
             database: {
                 host: 'localhost',

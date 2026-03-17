@@ -19,7 +19,14 @@ import { LoggingMiddleware } from '../middleware/logging-middleware'
 export interface ServerManagerConfig {
     port: number
     host: string
-    cors: boolean
+    cors:
+        | boolean
+        | {
+              origin: string | string[]
+              credentials?: boolean
+              methods?: string[]
+              allowedHeaders?: string[]
+          }
     compression: boolean
     security: boolean
     socketio?: {
@@ -73,8 +80,36 @@ export class ServerManager {
         }
 
         // CORS middleware
-        if (this.config.cors) {
-            this.app.use(cors())
+        if (this.config.cors !== false) {
+            const corsOptions: any =
+                typeof this.config.cors === 'object'
+                    ? { ...this.config.cors }
+                    : {}
+
+            // Add a debug logger to see exactly which origins are being checked
+            if (Array.isArray(corsOptions.origin)) {
+                const allowedOrigins = corsOptions.origin
+                corsOptions.origin = (
+                    origin: string | undefined,
+                    callback: any
+                ) => {
+                    // Allow non-browser requests (Postman, curl, etc.)
+                    if (!origin) return callback(null, true)
+
+                    if (
+                        allowedOrigins.includes(origin) ||
+                        allowedOrigins.includes('*')
+                    ) {
+                        callback(null, true)
+                    } else {
+                        logger.warn(
+                            `[CORS] Blocked request from unauthorized origin: "${origin}" (Allowed: ${allowedOrigins.join(', ')})`
+                        )
+                        callback(null, false)
+                    }
+                }
+            }
+            this.app.use(cors(corsOptions))
         }
 
         // Compression middleware - simplified for now
