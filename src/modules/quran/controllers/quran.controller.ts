@@ -14,9 +14,9 @@ export class QuranController {
 
     /**
      * @openapi
-     * /api/quran/get-categories/{locale}:
+     * /api/quran/recitation/get-categories/{locale}:
      *   get:
-     *     summary: Get Quran Categories
+     *     summary: Get Quran Recitation Categories
      *     tags:
      *       - Quran
      *     parameters:
