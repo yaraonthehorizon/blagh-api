@@ -26,10 +26,11 @@ export class Application {
             logger.info('[Application] Configuration loaded')
 
             // Initialize database manager
-            this.databaseManager = new DatabaseManager(config.database)
-            await this.databaseManager.initialize()
-            logger.info('[Application] Database initialized')
+            // this.databaseManager = new DatabaseManager(config.database)
+            // await this.databaseManager.initialize()
+            // logger.info('[Application] Database initialized')
             // Initialize cache manager
+            logger.info('[Application] CacheManager initialized')
             await this.cacheManager.initialize()
 
             // Initialize plugin manager
