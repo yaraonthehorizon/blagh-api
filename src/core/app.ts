@@ -54,7 +54,7 @@ export class Application {
 
             // Load auth plugin
             await this.pluginManager.loadPlugin('auth', {
-                enabled: true,
+                enabled: false,
                 config: {},
             })
 
